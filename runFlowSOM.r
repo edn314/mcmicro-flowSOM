@@ -9,8 +9,8 @@ Command line arguments:
 '''
 
 # install packages
-install.packages("BiocManager")
-BiocManager::install("FlowSOM")
+if(!require('flowCore')) {install.packages('flowCore')}
+if(!require('FlowSOM')) {install.packages('FlowSOM')}
 
 # load libraries
 library("FlowSOM")
@@ -28,14 +28,14 @@ num_cols <- strtoi(keyword(data, '$PAR')[1])
 # run FlowSOM, not sure what to put for maxMeta and not sure if it matters
 fSOM <- FlowSOM(data, colsToUse=c(1:num_cols), maxMeta=as.integer(args[2]))
 
-# get clusters
+# get cluster assignments
 Cluster <- GetClusters(fSOM)
 
 # get raw input data and add clusters
-data_raw <- cbind(exprs(data), Cluster)
+data_raw <- cbind(Cluster, exprs(data))
 
 # make cells.csv
-cells <- data[,c('CellID','Cluster')]
+cells <- data_raw[,c('CellID','Cluster')]
 if (as.logical(args[3])) { # inlcude method column
     Method <- rep(c('FastPG'),nrow(cells))
     cells <- cbind(cells, Method)
