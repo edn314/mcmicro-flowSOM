@@ -110,7 +110,7 @@ def clean(input_file):
     data.to_csv(f'{output}/{clean_data_file}', index=False)
 
     if args.verbose:
-        print(f'Done. Cleaned data is in {output}/{clean_data_file}.csv.')
+        print(f'Done. Cleaned data is in {output}/{clean_data_file}.')
 
 
 '''
@@ -123,7 +123,13 @@ def convertToFSC():
     path = get_path() # get the path where the r script is located
 
     # Build subprocess command
-    command = ['Rscript', f'{path}/CSVtoFCS.r'] # use CSVtoFCS.r script
+    r_script = ['Rscript', f'{path}/CSVtoFCS.r'] # use CSVtoFCS.r script
+
+    # pass args
+    r_args = [output, clean_data_file]
+
+    # Build subprocess command
+    command = r_script + r_args
 
     # run it
     subprocess.run(command, universal_newlines=True)
