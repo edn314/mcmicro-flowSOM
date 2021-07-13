@@ -19,15 +19,18 @@
     library('flowCore')
     library('Biobase')
     library('data.table')
+
+    # get arguments
+    # 1. output dir
+    # 2. cleaned data csv
+    args <- commandArgs(trailingOnly=TRUE)
     
     # Use this to manually set the working directory
-    setwd("data/")                                                  # Set your working directory here (e.g. "/Users/Tom/Desktop/") -- press tab when selected after the '/' to see options
-    getwd()                                                         # Check your working directory has changed correctly
+    setwd(args[1])                                                  # Set your working directory here (e.g. "/Users/Tom/Desktop/") -- press tab when selected after the '/' to see options
     PrimaryDirectory <- getwd()                                     # Assign the working directory as 'PrimaryDirectory'
-    PrimaryDirectory
 
     ## Use to list the .csv files in the working directory -- important, the only CSV files in the directory should be the one desired for analysis. If more than one are found, only the first file will be used
-    FileNames <- list.files(path=PrimaryDirectory, pattern = ".csv")     # see a list of CSV files
+    FileNames <- list.files(path=PrimaryDirectory, pattern = args[2])     # see a list of CSV files
     as.matrix(FileNames) # See file names in a list
     
     ## Read data from Files into list of data frames
@@ -41,11 +44,6 @@
 
     rm(tempdata)
     AllSampleNames <- names(DataList)
-    
-    ## Chech data quality
-    head(DataList)
-
-    
     
 ##### END USER INPUT #####
 
@@ -65,6 +63,5 @@
       metadata$maxRange <- apply(data_subset,2,max)
       
       data_subset.ff <- new("flowFrame",exprs=as.matrix(data_subset), parameters=AnnotatedDataFrame(metadata)) # in order to create a flow frame, data needs to be read as matrix by exprs
-      head(data_subset.ff)
       write.FCS(data_subset.ff, paste0(a, ".fcs"))
     }
