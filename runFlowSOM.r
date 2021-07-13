@@ -21,8 +21,9 @@ if(!require('flowCore')) {install.packages('flowCore')}
 if(!require('FlowSOM')) {install.packages('FlowSOM')}
 
 # load libraries
-library("FlowSOM")
 library("flowCore")
+library("FlowSOM")
+
 
 # get arguments
 args <- commandArgs(trailingOnly=TRUE)

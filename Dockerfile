@@ -1,6 +1,7 @@
-FROM python:3
+FROM mcr.microsoft.com/bioconductor/bioconductor_docker
 
-# install r-base... I think there may be more required than that
-RUN apt install r-base
+RUN pip3 install pandas
 
-RUN pip install pandas
+RUN R -e 'BiocManager::install(c("flowCore","FlowSOM"))'
+
+COPY . /app
