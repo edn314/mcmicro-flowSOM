@@ -15,7 +15,7 @@ def parseArgs():
     parser.add_argument('-m', '--markers', help='A text file with a marker on each line to specify which markers to use for clustering', type=str, required=False)
     parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
     parser.add_argument('-c', '--method', help='Include a column with the method name in the output files.', action="store_true", required=False)
-    parser.add_argument('-n', '--max-num-metaclusters', help='Maximum number of clusters to try out for meta-clustering.', type=int, required=False)
+    parser.add_argument('-n', '--max-num-metaclusters', help='Maximum number of clusters to try out for meta-clustering.', type=int, required=False, default=30)
     args = parser.parse_args()
     return args
 

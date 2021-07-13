@@ -1,12 +1,20 @@
-'''
-Command line arguments:
-1. clean_data.fcs
-2. max number of meta clusters
-3. flag to include method name as column
-4. output directory
-5. output file name for cell/cluster assignment
-6. output file name for cluster mean feature values
-'''
+# Command line arguments:
+# 1. clean_data.fcs
+# 2. max number of meta clusters
+# 3. flag to include method name as column
+# 4. output directory
+# 5. output file name for cell/cluster assignment
+# 6. output file name for cluster mean feature values
+
+
+# paramenters we could edit
+# number of metaclusters
+# number clusters
+# iterations
+# seed - is this even a thing w it being in docker?
+# transformations?? this is some sort of normalization... which I dont think we want to do (already done?)
+# compensation?
+
 
 # install packages
 if(!require('flowCore')) {install.packages('flowCore')}
