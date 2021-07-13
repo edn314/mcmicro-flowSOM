@@ -15,6 +15,7 @@ def parseArgs():
     parser.add_argument('-m', '--markers', help='A text file with a marker on each line to specify which markers to use for clustering', type=str, required=False)
     parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
     parser.add_argument('-c', '--method', help='Include a column with the method name in the output files.', action="store_true", required=False)
+    parser.add_argument('-n', '--max-num-metaclusters', help='Maximum number of clusters to try out for meta-clustering.', type=int, required=False)
     args = parser.parse_args()
     return args
 
@@ -121,12 +122,8 @@ def convertToFSC():
 
     path = get_path() # get the path where the r script is located
 
-    r_script = ['Rscript', f'{path}/.r'] # use FastPG.r script
-    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
-    r_args = [f'{output}/{clean_data_file}']
-
     # Build subprocess command
-    command = r_script + r_args
+    command = ['Rscript', f'{path}/CSVtoFCS.r'] # use CSVtoFCS.r script
 
     # run it
     subprocess.run(command, universal_newlines=True)
@@ -146,7 +143,7 @@ def runFlowSOM():
 
     r_script = ['Rscript', f'{path}/runFlowSOM.r'] # use FastPG.r script
     # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
-    r_args = [f'{output}/{clean_data_file}', output, cells_file, clusters_file, str(args.method)]
+    r_args = [f'{output}/{clean_data_fcs_file}', str(args.max_num_metaclusters), str(args.method), output, cells_file, clusters_file]
 
     # Build subprocess command
     command = r_script + r_args
@@ -182,6 +179,7 @@ if __name__ == '__main__':
     # output file names
     data_prefix = getDataName(args.input) # get the name of the input data file to add as a prefix to the output file names
     clean_data_file = f'{data_prefix}-clean.csv' # name of output cleaned data CSV file
+    clean_data_fcs_file = f'{data_prefix}-clean.fcs' # name of output cleaned data CSV file
     clusters_file = f'{data_prefix}-clusters.csv' # name of output CSV file that contains the mean expression of each feaute, for each cluster
     cells_file = f'{data_prefix}-cells.csv' # name of output CSV file that contains each cell ID and it's cluster assignation
     
