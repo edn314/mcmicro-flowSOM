@@ -10,7 +10,6 @@
 # paramenters we could edit
 # number clusters
 # iterations
-# seed - is this even a thing w it being in docker?
 # transformations?? this is some sort of normalization... which I dont think we want to do (already done?)
 # compensation?
 
