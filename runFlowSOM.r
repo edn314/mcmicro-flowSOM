@@ -6,13 +6,8 @@
 # 5. output file name for cell/cluster assignment
 # 6. output file name for cluster mean feature values
 
-
-# paramenters we could edit
-# number clusters
-# iterations
 # transformations?? this is some sort of normalization... which I dont think we want to do (already done?)
-# compensation?
-
+# if max value over 1000, log transform
 
 # install packages
 if(!require('flowCore')) {install.packages('flowCore')}
@@ -32,10 +27,20 @@ data <- read.FCS(args[1])
 # get num cols
 num_cols <- strtoi(keyword(data, '$PAR')[1])
 
-# run FlowSOM, not sure what to put for maxMeta and not sure if it matters
-# from the paper (FlowSOM: Using Self-Organizing Maps forVisualization and Interpretation ofCytometry Data): 
-# "To choose the number of meta-clusters, onecan either use prior knowledge about the number of expectedcell types, or one can use the so called “elbow”-criterion."
-fSOM <- FlowSOM(data, colsToUse=c(1:num_cols), nClus=as.integer(args[2]))
+# check if log transformation is necessary
+maxs <- vector() # initialize vec
+for(i in 2:num_cols) { # loop through column indices (excluding the first one which is cell ID)
+    x <- append(x,max(exprs(data)[,i])) # add max of column to vec
+}
+max = max(maxs) # get the max of all the maxs
+
+if (max > 1000) {
+    # run FlowSOM with log transformation
+    fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), transform=TRUE, toTransform=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL)
+} else {
+    # run FlowSOM, cluster using all columns besides first (assuming it is the cell ID column)
+    fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL)
+}
 
 # get cluster assignments
 Cluster <- GetClusters(fSOM)
@@ -52,6 +57,7 @@ if (as.logical(args[3])) { # inlcude method column
 write.table(cells,file=paste(args[4], args[5], sep='/'), row.names=FALSE, quote=FALSE, sep=',') # write data to csv
 
 # make clusters.csv
+# the averages are not log transformed, but the original values
 clusterData <- aggregate(subset(data_raw, select=-c(CellID)), list(data_raw[,'Cluster']), mean) # group feature/expression data by cluster and find mean expression for each cluster, remove CellID column
 clusterData <- subset(clusterData, select=-c(Group.1)) # remove group number column because is identical to community assignation number
 if (as.logical(args[3])) { # inlcude method column
