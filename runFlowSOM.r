@@ -35,7 +35,9 @@ max = max(maxs) # get the max of all the maxs
 if (max > 1000) {
     # log transform the data
     logTrans <- logTransform(transformationId="log10-transformation", logbase=10, r=1, d=1)
-    trans <- transformList(colnames(data), logTrans)
+    cols <- colnames(data)
+    cols <- cols[cols != 'CellID'] # do not log transform cell IDs
+    trans <- transformList(cols, logTrans)
     data <- transform(data, trans)
 }
 
