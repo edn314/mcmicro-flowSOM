@@ -6,9 +6,6 @@
 # 5. output file name for cell/cluster assignment
 # 6. output file name for cluster mean feature values
 
-# transformations?? this is some sort of normalization... which I dont think we want to do (already done?)
-# if max value over 1000, log transform
-
 # install packages
 if(!require('flowCore')) {install.packages('flowCore')}
 if(!require('FlowSOM')) {install.packages('FlowSOM')}
@@ -30,7 +27,7 @@ num_cols <- length(colnames(data))
 # check if log transformation is necessary
 maxs <- vector() # initialize vec
 for(i in 2:num_cols) { # loop through column indices (excluding the first one which is cell ID)
-    x <- append(x,max(exprs(data)[,i])) # add max of column to vec
+    maxs <- append(maxs,max(exprs(data)[,i])) # add max of column to vec
 }
 max = max(maxs) # get the max of all the maxs
 
@@ -40,13 +37,10 @@ if (max > 1000) {
     logTrans <- logTransform(transformationId="log10-transformation", logbase=10, r=1, d=1)
     trans <- transformList(colnames(data), logTrans)
     data <- transform(data, trans)
-    
-    # run FlowSOM with log transformed data
-    fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), transform=TRUE, toTransform=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL)
-} else {
-    # run FlowSOM, cluster using all columns besides first (assuming it is the cell ID column)
-    fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL)
 }
+
+# run FlowSOM, cluster using all columns besides first (assuming it is the cell ID column)
+fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL)
 
 # get cluster assignments
 Cluster <- GetClusters(fSOM)
