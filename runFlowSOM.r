@@ -34,6 +34,7 @@ for(i in 2:num_cols) { # loop through column indices (excluding the first one wh
 }
 max = max(maxs) # get the max of all the maxs
 
+# if the highest expression value is greater than 1000, log transform the data
 if (max > 1000) {
     # run FlowSOM with log transformation
     fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), transform=TRUE, toTransform=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL)
