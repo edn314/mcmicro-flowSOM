@@ -13,9 +13,12 @@ def parseArgs():
     parser.add_argument('-i', '--input', help="Input CSV of mcmicro marker expression data for cells", type=str, required=True)
     parser.add_argument('-o', '--output', help='The directory to which output files will be saved', type=str, required=False)
     parser.add_argument('-m', '--markers', help='A text file with a marker on each line to specify which markers to use for clustering', type=str, required=False)
-    parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action="store_true", required=False)
-    parser.add_argument('-c', '--method', help='Include a column with the method name in the output files.', action="store_true", required=False)
+    parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action='store_true', required=False)
+    parser.add_argument('-c', '--method', help='Include a column with the method name in the output files.', action='store_true', required=False)
     parser.add_argument('-n', '--num-metaclusters', help='number of clusters for meta-clustering. Default is 25.', type=int, required=False, default=25)
+    parser.add_argument('-y', '--config', help='A yaml config file that states whether the input data should be log/logicle transformed.', type=str, required=False)
+    parser.add_argument('--force-transform', help='Logicle transform the input data. If omitted, and --no-transform is omitted, logicle transform is only performed if the max value in the input data is >1000.', action='store_true', required=False)
+    parser.add_argument('--no-transform', help='Do not perform Logicle transformation on the input data. If omitted, and --force-transform is omitted, logicle transform is only performed if the max value in the input data is >1000.', action='store_true', required=False)
     args = parser.parse_args()
     return args
 
@@ -148,8 +151,8 @@ def runFlowSOM():
     path = get_path() # get the path where the r script is located
 
     r_script = ['Rscript', f'{path}/runFlowSOM.r'] # use FastPG.r script
-    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name
-    r_args = [f'{output}/{clean_data_fcs_file}', str(args.num_metaclusters), str(args.method), output, cells_file, clusters_file]
+    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name, logicle transform flag
+    r_args = [f'{output}/{clean_data_fcs_file}', str(args.num_metaclusters), str(args.method), output, cells_file, clusters_file, transform]
 
     # Build subprocess command
     command = r_script + r_args
@@ -159,6 +162,21 @@ def runFlowSOM():
 
     if args.verbose:
         print('Done.')
+
+
+'''
+Read config.yml file contents.
+'''
+def readConfig(file):
+    f = open(file, 'r')
+    lines = f.readlines()
+
+    # find line with 'transform:' in it
+    for l in lines:
+        if 'transform:' in l.strip():
+            transform = l.split(':')[-1].strip() # get last value after colon
+
+    return transform
 
 
 '''
@@ -178,6 +196,16 @@ if __name__ == '__main__':
     # get list of markers if provided
     if args.markers is not None:
         markers = get_markers(args.markers)
+
+    # assess logicle transform parameter
+    if args.force_transform and not args.no_transform:
+        transform = 'true'
+    elif not args.force_transform and args.no_transform:
+        transform = 'false'
+    elif args.config is not None:
+        transform = readConfig(args.config)
+    else:
+        transform = 'auto'
 
     # constants
     CELL_ID = 'CellID' # column name holding cell IDs
