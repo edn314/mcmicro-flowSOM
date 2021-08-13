@@ -15,7 +15,9 @@ def parseArgs():
     parser.add_argument('-m', '--markers', help='A text file with a marker on each line to specify which markers to use for clustering', type=str, required=False)
     parser.add_argument('-v', '--verbose', help='Flag to print out progress of script', action='store_true', required=False)
     parser.add_argument('-c', '--method', help='Include a column with the method name in the output files.', action='store_true', required=False)
-    parser.add_argument('-n', '--num-metaclusters', help='number of clusters for meta-clustering. Default is 25.', type=int, required=False, default=25)
+    parser.add_argument('-n', '--num-metaclusters', help='The number of clusters for meta-clustering. Default is 25.', type=int, required=False, default=25)
+    parser.add_argument('--xdim', help='The number of neurons in the SOM in the x dimension. Default is 10.', type=int, required=False, default=10)
+    parser.add_argument('--ydim', help='The number of neurons in the SOM in the y dimension. Default is 10.', type=int, required=False, default=10)
     parser.add_argument('-y', '--config', help='A yaml config file that states whether the input data should be log/logicle transformed.', type=str, required=False)
     parser.add_argument('--force-transform', help='Logicle transform the input data. If omitted, and --no-transform is omitted, logicle transform is only performed if the max value in the input data is >1000.', action='store_true', required=False)
     parser.add_argument('--no-transform', help='Do not perform Logicle transformation on the input data. If omitted, and --force-transform is omitted, logicle transform is only performed if the max value in the input data is >1000.', action='store_true', required=False)
@@ -151,8 +153,8 @@ def runFlowSOM():
     path = get_path() # get the path where the r script is located
 
     r_script = ['Rscript', f'{path}/runFlowSOM.r'] # use FastPG.r script
-    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name, logicle transform flag
-    r_args = [f'{output}/{clean_data_fcs_file}', str(args.num_metaclusters), str(args.method), output, cells_file, clusters_file, transform]
+    # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name, logicle transform flag, xdim, ydim
+    r_args = [f'{output}/{clean_data_fcs_file}', str(args.num_metaclusters), str(args.method), output, cells_file, clusters_file, transform, xdim, ydim]
 
     # Build subprocess command
     command = r_script + r_args
@@ -206,6 +208,10 @@ if __name__ == '__main__':
         transform = readConfig(args.config)
     else:
         transform = 'auto'
+
+    # get xdim and ydim
+    xdim = args.xdim
+    ydim = args.ydim
 
     # constants
     CELL_ID = 'CellID' # column name holding cell IDs

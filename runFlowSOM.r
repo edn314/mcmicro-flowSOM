@@ -6,6 +6,8 @@
 # 5. output file name for cell/cluster assignment
 # 6. output file name for cluster mean feature values
 # 7. logicle transform flag
+# 8. xdim
+# 9. ydim
 
 # install packages
 if(!require('flowCore')) {install.packages('flowCore')}
@@ -53,7 +55,7 @@ if (args[7] == 'true' || args[7] == 'auto') {
 close(f)
 
 # run FlowSOM, cluster using all columns besides first (assuming it is the cell ID column)
-fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL)
+fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL, xdim=args[8], ydim=args[9])
 
 # get cluster assignments
 Cluster <- GetMetaclusters(fSOM)
