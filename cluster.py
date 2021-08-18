@@ -154,7 +154,7 @@ def runFlowSOM():
 
     r_script = ['Rscript', f'{path}/runFlowSOM.r'] # use FastPG.r script
     # pass input data file, k value, number of cpus to use for the k nearest neighbors part of clustering, output dir, cells file name, clusters file name, logicle transform flag, xdim, ydim
-    r_args = [f'{output}/{clean_data_fcs_file}', str(args.num_metaclusters), str(args.method), output, cells_file, clusters_file, transform, xdim, ydim]
+    r_args = [f'{output}/{clean_data_fcs_file}', str(args.num_metaclusters), str(args.method), output, cells_file, clusters_file, transform, str(xdim), str(ydim)]
 
     # Build subprocess command
     command = r_script + r_args
