@@ -55,7 +55,7 @@ if (args[7] == 'true' || args[7] == 'auto') {
 close(f)
 
 # run FlowSOM, cluster using all columns besides first (assuming it is the cell ID column)
-fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL, xdim=as.integer(args[8]), ydim=as.integer(args[9]))
+fSOM <- FlowSOM(data, colsToUse=c(2:num_cols), nClus=as.integer(args[2]), compensate=FALSE, spillover=NULL, xdim=as.integer(args[8]), ydim=as.integer(args[9]), seed=8613)
 
 # get cluster assignments
 Cluster <- GetMetaclusters(fSOM)
